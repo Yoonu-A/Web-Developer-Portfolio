@@ -296,17 +296,60 @@ document.addEventListener('DOMContentLoaded', () => {
   // ----------------------------------------------------------------------------
   // 10. SERVICES QUICK-INQUIRY ACTION
   // ----------------------------------------------------------------------------
-  // When user clicks "Inquire about this service", pre-fill subject in contact form
+  // When user clicks "Inquire about this service", pre-fill subject and smoothly navigate
   const serviceActionLinks = document.querySelectorAll('.service-action-link');
   const subjectInput = document.getElementById('contact-subject');
+  const hiddenSubjectInput = document.getElementById('formsubmit-subject');
+  const contactFormCard = document.getElementById('contact-form-card');
+  const contactSection = document.getElementById('contact');
 
   serviceActionLinks.forEach(link => {
     link.addEventListener('click', (e) => {
-      const serviceName = link.getAttribute('data-service');
-      if (subjectInput && serviceName) {
+      e.preventDefault();
+      const serviceName = link.getAttribute('data-service') || 'Web Development';
+      
+      if (subjectInput) {
         subjectInput.value = `Inquiry: ${serviceName}`;
-        showToast(`Subject set to: "${serviceName}"`, '📝');
+        if (hiddenSubjectInput) {
+          hiddenSubjectInput.value = `Inquiry: ${serviceName}`;
+        }
+        if (typeof clearError === 'function') {
+          const group = subjectInput.closest('.form-group');
+          const errorSpan = document.getElementById('subject-error');
+          clearError(group, errorSpan);
+        }
       }
+
+      // Smoothly scroll to contact section with sticky header offset
+      if (contactSection) {
+        const headerOffset = 80;
+        const elementPosition = contactSection.getBoundingClientRect().top;
+        const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+        window.scrollTo({
+          top: offsetPosition,
+          behavior: 'smooth'
+        });
+      }
+
+      // Flash highlight animation on the form card
+      if (contactFormCard) {
+        contactFormCard.classList.remove('highlighted');
+        void contactFormCard.offsetWidth; // Trigger DOM reflow
+        contactFormCard.classList.add('highlighted');
+      }
+
+      showToast(`Inquiry prepared for "${serviceName}" ✨`, '📝');
+
+      // Focus name or message input
+      setTimeout(() => {
+        const nameField = document.getElementById('contact-name');
+        const messageField = document.getElementById('contact-message');
+        if (nameField && !nameField.value.trim()) {
+          nameField.focus();
+        } else if (messageField) {
+          messageField.focus();
+        }
+      }, 400);
     });
   });
 
@@ -464,9 +507,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Handle Form Submission
+  // Handle Form Submission with Real Email Delivery
   if (contactForm) {
-    contactForm.addEventListener('submit', (e) => {
+    contactForm.addEventListener('submit', async (e) => {
       e.preventDefault();
 
       const isNameValid = validateName();
@@ -475,37 +518,70 @@ document.addEventListener('DOMContentLoaded', () => {
       const isMessageValid = validateMessage();
 
       if (!isNameValid || !isEmailValid || !isSubjectValid || !isMessageValid) {
-        showFormAlert('Please fix the errors above before sending.', 'error');
+        showFormAlert('Please fix the highlighted fields above before sending.', 'error');
         // Focus the first invalid field
-        if (!isNameValid) nameInput.focus();
-        else if (!isEmailValid) emailInput.focus();
-        else if (!isSubjectValid) subjectInput.focus();
-        else if (!isMessageValid) messageInput.focus();
+        if (!isNameValid && nameInput) nameInput.focus();
+        else if (!isEmailValid && emailInput) emailInput.focus();
+        else if (!isSubjectValid && subjectInput) subjectInput.focus();
+        else if (!isMessageValid && messageInput) messageInput.focus();
         return;
       }
 
-      // Simulate sending state
-      const originalBtnHTML = submitBtn.innerHTML;
-      submitBtn.disabled = true;
-      submitBtn.innerHTML = `<span>Validating &amp; Preparing...</span>`;
+      const senderName = nameInput ? nameInput.value.trim() : '';
+      const senderEmail = emailInput ? emailInput.value.trim() : '';
+      const subjectText = subjectInput && subjectInput.value.trim() ? subjectInput.value.trim() : 'Portfolio Inquiry';
+      const messageBody = messageInput ? messageInput.value.trim() : '';
 
-      setTimeout(() => {
-        const senderName = nameInput.value.trim();
-        const senderEmail = emailInput.value.trim();
-        const subjectText = subjectInput.value.trim();
-        const messageBody = messageInput.value.trim();
+      // Update button to sending state
+      const originalBtnHTML = submitBtn ? submitBtn.innerHTML : 'Send Message';
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = `<span>Sending inquiry...</span>`;
+      }
 
-        // Successful validation message
-        showFormAlert(`✓ Thank you, <strong>${senderName}</strong>! Your message was validated successfully. (Note: Client-side demo. Click below if you wish to launch your mail client directly to deliver it.)`, 'success');
-        showToast('Message validated successfully!', '✅');
+      try {
+        const response = await fetch('https://formsubmit.co/ajax/yoonuwebdev@gmail.com', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify({
+            name: senderName,
+            email: senderEmail,
+            _subject: subjectText,
+            message: messageBody,
+            _captcha: 'false',
+            _template: 'table'
+          })
+        });
 
-        // Reset button
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = originalBtnHTML;
+        const data = await response.json().catch(() => ({}));
 
-        // Reset form inputs
-        contactForm.reset();
-      }, 700);
+        if (response.ok || data.success === 'true' || data.success === true) {
+          showFormAlert(`✓ Thank you, <strong>${senderName}</strong>! Your inquiry has been sent successfully to <strong>yoonuwebdev@gmail.com</strong>. Yoonus will reply shortly.`, 'success');
+          showToast('Inquiry sent successfully! 🚀', '✅');
+          contactForm.reset();
+        } else {
+          throw new Error(data.message || 'Server response was not ok');
+        }
+      } catch (err) {
+        console.warn('FormSubmit AJAX fallback to mailto:', err);
+        // Automatic fallback: Open email client with prefilled details
+        const fallbackMailto = `mailto:yoonuwebdev@gmail.com?subject=${encodeURIComponent(subjectText)}&body=${encodeURIComponent(messageBody + '\n\n-- From: ' + senderName + (senderEmail ? ' (' + senderEmail + ')' : ''))}`;
+
+        showFormAlert(`Network form delivery encountered an issue. Launching your email app directly to send to <strong>yoonuwebdev@gmail.com</strong>...`, 'error');
+        showToast('Opening email client as backup...', '📧');
+
+        setTimeout(() => {
+          window.location.href = fallbackMailto;
+        }, 1200);
+      } finally {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = originalBtnHTML;
+        }
+      }
     });
   }
 
@@ -525,9 +601,11 @@ document.addEventListener('DOMContentLoaded', () => {
   if (mailtoDirectBtn) {
     mailtoDirectBtn.addEventListener('click', () => {
       const name = nameInput ? nameInput.value.trim() : '';
+      const email = emailInput ? emailInput.value.trim() : '';
       const subj = subjectInput && subjectInput.value.trim() ? subjectInput.value.trim() : 'Portfolio Inquiry';
-      const bodyText = messageInput && messageInput.value.trim() 
-        ? `${messageInput.value.trim()}\n\n-- From: ${name}`
+      const msg = messageInput && messageInput.value.trim() ? messageInput.value.trim() : '';
+      const bodyText = msg 
+        ? `${msg}\n\n-- From: ${name || 'A Website Visitor'}${email ? ' (' + email + ')' : ''}`
         : `Hi Yoonus,\n\nI visited your portfolio and wanted to reach out regarding...`;
 
       const mailtoUrl = `mailto:yoonuwebdev@gmail.com?subject=${encodeURIComponent(subj)}&body=${encodeURIComponent(bodyText)}`;

@@ -81,9 +81,8 @@ Web-Developer-Portfolio/
 
 - **Change Personal Details**: Open `index.html` and edit your name, bio, social links, and email address.
 - **Change Avatar**: Replace `assets/profile.jpg` with your own profile picture (a square 1:1 ratio is recommended).
-- **Connect Real Email Backend**:
-  - To receive emails directly from the contact form without a backend, sign up for [Formspree](https://formspree.io) or [EmailJS](https://www.emailjs.com).
-  - Simply set `action="https://formspree.io/f/YOUR_FORM_ID"` and `method="POST"` on `<form id="contact-form">` in `index.html`.
+- **Inquiry Delivery Backend**:
+  - The contact form is wired to deliver directly to `yoonuwebdev@gmail.com` via FormSubmit API with seamless client-side validation and automatic fallback to default email apps.
 
 ---
 
