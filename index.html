@@ -945,9 +945,13 @@
 
           <!-- Contact Form Column -->
           <div class="contact-form-col reveal reveal-right">
-            <div class="contact-form-card">
+            <div class="contact-form-card" id="contact-form-card">
               
-              <form class="contact-form" id="contact-form" novalidate>
+              <form class="contact-form" id="contact-form" action="https://formsubmit.co/yoonuwebdev@gmail.com" method="POST" novalidate>
+                <!-- FormSubmit Configuration -->
+                <input type="hidden" name="_captcha" value="false">
+                <input type="hidden" name="_template" value="table">
+                <input type="hidden" name="_subject" id="formsubmit-subject" value="New Portfolio Inquiry">
                 
                 <!-- Name Field -->
                 <div class="form-group">
@@ -1041,10 +1045,10 @@
                 <!-- Form status feedback banner -->
                 <div class="form-alert" id="form-alert" role="alert" aria-live="polite" style="display: none;"></div>
 
-                <!-- Transparent Developer Note regarding Backend Connectivity -->
+                <!-- Direct Inbox Delivery Info Note -->
                 <div class="form-note">
-                  <span class="note-icon">ℹ️</span>
-                  <span><strong>Frontend Validation Active:</strong> This form validates all fields in client-side JavaScript. To send real emails, you can connect services like Formspree or EmailJS (see code comments). You can also click below to open your default email app directly.</span>
+                  <span class="note-icon">📨</span>
+                  <span><strong>Direct Email Delivery:</strong> Inquiries submitted through this form are sent directly to <strong>yoonuwebdev@gmail.com</strong>. You can also click below to launch your email client directly.</span>
                 </div>
                 <div class="mailto-fallback-row">
                   <button type="button" class="btn btn-sm btn-outline btn-block" id="mailto-direct-btn">
