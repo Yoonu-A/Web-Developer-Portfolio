@@ -530,7 +530,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ? `${messageInput.value.trim()}\n\n-- From: ${name}`
         : `Hi Yoonus,\n\nI visited your portfolio and wanted to reach out regarding...`;
 
-      const mailtoUrl = `mailto:rizanmhd1978@gmail.com?subject=${encodeURIComponent(subj)}&body=${encodeURIComponent(bodyText)}`;
+      const mailtoUrl = `mailto:yoonuwebdev@gmail.com?subject=${encodeURIComponent(subj)}&body=${encodeURIComponent(bodyText)}`;
       window.location.href = mailtoUrl;
       showToast('Opening default email client...', '📧');
     });
@@ -587,7 +587,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const cvText = `=================================================================
 YOONUS KHAN - CURRICULUM VITAE
 Aspiring Web Developer
-Email: rizanmhd1978@gmail.com
+Email: yoonuwebdev@gmail.com
 GitHub: https://github.com/yoonus-khan
 LinkedIn: https://linkedin.com/in/yoonus-khan
 =================================================================
