@@ -588,7 +588,7 @@ document.addEventListener('DOMContentLoaded', () => {
 YOONUS KHAN - CURRICULUM VITAE
 Aspiring Web Developer
 Email: yoonuwebdev@gmail.com
-GitHub: https://github.com/yoonus-khan
+GitHub: https://github.com/Yoonu-A
 LinkedIn: https://linkedin.com/in/yoonus-khan
 =================================================================
 
@@ -748,7 +748,7 @@ SERVICES AIMED TO OFFER:
             </div>
           </div>
           <div style="text-align: right;">
-            <a href="https://github.com/yoonus-khan/CyberLearn" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-sm">
+            <a href="https://github.com/Yoonu-A/CyberLearn" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-sm">
               Explore CyberLearn on GitHub &rarr;
             </a>
           </div>
